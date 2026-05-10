@@ -1,0 +1,108 @@
+{
+  "info": {
+    "name": "Users API",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "description": "Complete test suite for the Users REST API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', () => {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response has data array', () => {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data).to.be.an('array');",
+              "  pm.expect(body.data.length).to.be.greaterThan(0);",
+              "});",
+              "pm.test('Response time under 500ms', () => {",
+              "  pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/users?page=1"
+      }
+    },
+    {
+      "name": "Get Single User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', () => {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('User ID matches', () => {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data.id).to.eql(2);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/users/2"
+      }
+    },
+    {
+      "name": "Create User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', () => {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "pm.test('Response contains id', () => {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.id).to.exist;",
+              "  pm.environment.set('createdUserId', body.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Damla\", \"job\": \"QA Engineer\"}"
+        },
+        "url": "{{baseUrl}}/users"
+      }
+    },
+    {
+      "name": "Delete User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 204', () => {",
+              "  pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/users/2"
+      }
+    }
+  ]
+}
