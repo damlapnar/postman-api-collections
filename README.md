@@ -2,7 +2,8 @@
 
 ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=postman&logoColor=white)
 ![Newman](https://img.shields.io/badge/Newman-CLI-FF6C37?style=flat-square)
-![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)
+[![CI](https://github.com/damlapnar/postman-api-collections/actions/workflows/newman.yml/badge.svg)](https://github.com/damlapnar/postman-api-collections/actions/workflows/newman.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Postman collections for REST API testing with Newman CLI integration. Runs automatically in CI on every push and daily schedule.
 
