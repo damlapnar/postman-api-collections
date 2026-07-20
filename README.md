@@ -14,7 +14,8 @@ postman-api-collections/
 ├── collections/
 │   └── users-api.json       # Users CRUD test suite
 ├── environments/
-│   └── staging.json         # Staging environment variables
+│   ├── staging.json         # Staging environment variables
+│   └── production.json      # Production environment variables
 └── .github/workflows/
     └── newman.yml           # CI pipeline
 ```

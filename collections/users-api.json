@@ -2,7 +2,7 @@
   "info": {
     "name": "Users API",
     "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "description": "Complete test suite for the Users REST API \u2014 CRUD, pagination, edge cases",
+    "description": "Complete test suite for the Users REST API — CRUD, pagination, auth, edge cases",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -14,8 +14,8 @@
           "script": {
             "exec": [
               "pm.test('Status 200', () => pm.response.to.have.status(200));",
-              "pm.test('Has data array', () => { const b = pm.response.json(); pm.expect(b.data).to.be.an('array').with.lengthOf.above(0); });",
-              "pm.test('Has pagination fields', () => { const b = pm.response.json(); pm.expect(b).to.have.all.keys('page','per_page','total','total_pages','data'); });",
+              "pm.test('Has users array', () => { const b = pm.response.json(); pm.expect(b.users).to.be.an('array').with.lengthOf.above(0); });",
+              "pm.test('Has pagination fields', () => { const b = pm.response.json(); pm.expect(b).to.have.all.keys('users','total','skip','limit'); });",
               "pm.test('Response time < 800ms', () => pm.expect(pm.response.responseTime).to.be.below(800));"
             ]
           }
@@ -23,7 +23,7 @@
       ],
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/users?page=1"
+        "url": "{{baseUrl}}/users?limit=5&skip=0"
       }
     },
     {
@@ -34,15 +34,15 @@
           "script": {
             "exec": [
               "pm.test('Status 200', () => pm.response.to.have.status(200));",
-              "pm.test('Page 2 returned', () => pm.expect(pm.response.json().page).to.eql(2));",
-              "pm.test('Data is non-empty', () => pm.expect(pm.response.json().data.length).to.be.above(0));"
+              "pm.test('Skip 5 returned', () => pm.expect(pm.response.json().skip).to.eql(5));",
+              "pm.test('Users is non-empty', () => pm.expect(pm.response.json().users.length).to.be.above(0));"
             ]
           }
         }
       ],
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/users?page=2"
+        "url": "{{baseUrl}}/users?limit=5&skip=5"
       }
     },
     {
@@ -53,8 +53,8 @@
           "script": {
             "exec": [
               "pm.test('Status 200', () => pm.response.to.have.status(200));",
-              "pm.test('User ID is 2', () => pm.expect(pm.response.json().data.id).to.eql(2));",
-              "pm.test('Has email field', () => pm.expect(pm.response.json().data.email).to.be.a('string'));"
+              "pm.test('User ID is 2', () => pm.expect(pm.response.json().id).to.eql(2));",
+              "pm.test('Has email field', () => pm.expect(pm.response.json().email).to.be.a('string'));"
             ]
           }
         }
@@ -72,14 +72,14 @@
           "script": {
             "exec": [
               "pm.test('Status 404', () => pm.response.to.have.status(404));",
-              "pm.test('Empty body', () => pm.expect(pm.response.json()).to.eql({}));"
+              "pm.test('Error message present', () => pm.expect(pm.response.json().message).to.be.a('string'));"
             ]
           }
         }
       ],
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/users/9999"
+        "url": "{{baseUrl}}/users/999999"
       }
     },
     {
@@ -91,8 +91,7 @@
             "exec": [
               "pm.test('Status 201', () => pm.response.to.have.status(201));",
               "pm.test('Returns id', () => { const b = pm.response.json(); pm.expect(b.id).to.exist; pm.environment.set('createdUserId', b.id); });",
-              "pm.test('Returns correct name', () => pm.expect(pm.response.json().name).to.eql('Damla'));",
-              "pm.test('Returns createdAt', () => pm.expect(pm.response.json().createdAt).to.exist);"
+              "pm.test('Returns correct name', () => pm.expect(pm.response.json().firstName).to.eql('Damla'));"
             ]
           }
         }
@@ -107,9 +106,9 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"name\": \"Damla\", \"job\": \"QA Engineer\"}"
+          "raw": "{\"firstName\": \"Damla\", \"age\": 30}"
         },
-        "url": "{{baseUrl}}/users"
+        "url": "{{baseUrl}}/users/add"
       }
     },
     {
@@ -120,8 +119,7 @@
           "script": {
             "exec": [
               "pm.test('Status 200', () => pm.response.to.have.status(200));",
-              "pm.test('Name updated', () => pm.expect(pm.response.json().name).to.eql('Damla Updated'));",
-              "pm.test('updatedAt present', () => pm.expect(pm.response.json().updatedAt).to.exist);"
+              "pm.test('Name updated', () => pm.expect(pm.response.json().firstName).to.eql('DamlaUpdated'));"
             ]
           }
         }
@@ -136,7 +134,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"name\": \"Damla Updated\", \"job\": \"Senior QA Engineer\"}"
+          "raw": "{\"firstName\": \"DamlaUpdated\"}"
         },
         "url": "{{baseUrl}}/users/2"
       }
@@ -149,8 +147,7 @@
           "script": {
             "exec": [
               "pm.test('Status 200', () => pm.response.to.have.status(200));",
-              "pm.test('Job updated', () => pm.expect(pm.response.json().job).to.eql('Lead QA Engineer'));",
-              "pm.test('updatedAt present', () => pm.expect(pm.response.json().updatedAt).to.exist);"
+              "pm.test('Age updated', () => pm.expect(pm.response.json().age).to.eql(99));"
             ]
           }
         }
@@ -165,7 +162,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"job\": \"Lead QA Engineer\"}"
+          "raw": "{\"age\": 99}"
         },
         "url": "{{baseUrl}}/users/2"
       }
@@ -177,8 +174,8 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status 204', () => pm.response.to.have.status(204));",
-              "pm.test('Empty body', () => pm.expect(pm.response.text()).to.be.empty);"
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Marked as deleted', () => pm.expect(pm.response.json().isDeleted).to.eql(true));"
             ]
           }
         }
@@ -196,7 +193,7 @@
           "script": {
             "exec": [
               "pm.test('Status 200', () => pm.response.to.have.status(200));",
-              "pm.test('Returns token', () => { const b = pm.response.json(); pm.expect(b.token).to.be.a('string'); pm.environment.set('authToken', b.token); });",
+              "pm.test('Returns token', () => { const b = pm.response.json(); pm.expect(b.accessToken).to.be.a('string'); pm.environment.set('authToken', b.accessToken); });",
               "pm.test('Response time < 1000ms', () => pm.expect(pm.response.responseTime).to.be.below(1000));"
             ]
           }
@@ -212,9 +209,9 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\"}"
+          "raw": "{\"username\": \"emilys\", \"password\": \"emilyspass\", \"expiresInMins\": 30}"
         },
-        "url": "{{baseUrl}}/login"
+        "url": "{{baseUrl}}/auth/login"
       }
     },
     {
@@ -225,7 +222,7 @@
           "script": {
             "exec": [
               "pm.test('Status 400', () => pm.response.to.have.status(400));",
-              "pm.test('Error message present', () => pm.expect(pm.response.json().error).to.eql('Missing password'));"
+              "pm.test('Error message present', () => pm.expect(pm.response.json().message).to.eql('Username and password required'));"
             ]
           }
         }
@@ -240,48 +237,20 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"email\": \"eve.holt@reqres.in\"}"
+          "raw": "{\"username\": \"emilys\"}"
         },
-        "url": "{{baseUrl}}/login"
+        "url": "{{baseUrl}}/auth/login"
       }
     },
     {
-      "name": "Register - Valid",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status 200', () => pm.response.to.have.status(200));",
-              "pm.test('Returns id and token', () => { const b = pm.response.json(); pm.expect(b.id).to.exist; pm.expect(b.token).to.exist; });"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\"}"
-        },
-        "url": "{{baseUrl}}/register"
-      }
-    },
-    {
-      "name": "Register - Missing Password",
+      "name": "Login - Invalid Password",
       "event": [
         {
           "listen": "test",
           "script": {
             "exec": [
               "pm.test('Status 400', () => pm.response.to.have.status(400));",
-              "pm.test('Error field present', () => pm.expect(pm.response.json().error).to.be.a('string'));"
+              "pm.test('Error message present', () => pm.expect(pm.response.json().message).to.eql('Invalid credentials'));"
             ]
           }
         }
@@ -296,9 +265,9 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\"email\": \"sydney@fife\"}"
+          "raw": "{\"username\": \"emilys\", \"password\": \"wrongpass\"}"
         },
-        "url": "{{baseUrl}}/register"
+        "url": "{{baseUrl}}/auth/login"
       }
     }
   ]
