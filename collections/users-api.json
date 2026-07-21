@@ -2,7 +2,7 @@
   "info": {
     "name": "Users API",
     "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "description": "Complete test suite for the Users REST API — CRUD, pagination, auth, edge cases",
+    "description": "Complete test suite for the Users REST API — CRUD, pagination, auth, edge cases. Targets dummyjson.com rather than reqres.in: reqres now requires an x-api-key on every request (a real signup + CI secret), while dummyjson needs no auth and still has a genuine /auth/login endpoint, so the auth-flow tests didn't have to be dropped.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -182,6 +182,7 @@
       ],
       "request": {
         "method": "DELETE",
+        "description": "dummyjson returns 200 with the deleted record (isDeleted: true), not the 204 No Content that REST convention — and reqres.in — would lead you to expect.",
         "url": "{{baseUrl}}/users/2"
       }
     },
@@ -201,6 +202,7 @@
       ],
       "request": {
         "method": "POST",
+        "description": "emilys/emilyspass is one of dummyjson's own published seed accounts (see /users), not a real credential — safe to commit.",
         "header": [
           {
             "key": "Content-Type",
